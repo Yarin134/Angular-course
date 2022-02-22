@@ -27,7 +27,6 @@
               "src/assets"
             ],
             "styles": [
-              
               "node_modules/bootstrap/dist/css/bootstrap.css",
               "src/styles.css"
             ],
@@ -96,14 +95,25 @@
               "src/assets"
             ],
             "styles": [
-        
               "src/styles.css"
             ],
             "scripts": []
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
           }
         }
       }
     }
   },
-  "defaultProject": "shop-project"
+  "defaultProject": "shop-project",
+  "cli": {
+    "defaultCollection": "@angular-eslint/schematics"
+  }
 }

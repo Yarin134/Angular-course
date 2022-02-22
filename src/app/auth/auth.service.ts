@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, tap } from "rxjs/operators";
-import { BehaviorSubject, Subject,  throwError } from "rxjs";
+import { BehaviorSubject,  throwError } from "rxjs";
 import { User } from "./user.model";
 import { Router } from "@angular/router";
 
@@ -29,12 +29,14 @@ export class AuthService {
         {email:email , 
         password:password ,
         returnSecureToken: true
-        }
-        ).pipe(catchError(this.errorHandling) ,tap(resData => {
-            this.handleAuthentication(resData.email ,
-              resData.localId , 
-              resData.idToken ,
-               +resData.expiresIn)
+        } // the data object will be send with the post request
+
+        ).pipe(catchError(this.errorHandling) ,tap(resData => { // the response from the server
+            this.handleAuthentication(
+            resData.email ,
+            resData.localId , 
+            resData.idToken ,
+            +resData.expiresIn)
          })) // pass the error argument automatically to the function
     }
 
@@ -44,7 +46,7 @@ export class AuthService {
             password:password ,
             returnSecureToken: true
         }
-        ).pipe(catchError(this.errorHandling) , tap(resData => {
+        ).pipe(catchError(this.errorHandling) , tap(resData => { // the response from the server
            this.handleAuthentication(resData.email ,
              resData.localId , 
              resData.idToken ,
@@ -63,7 +65,7 @@ export class AuthService {
               this.user.next(user);
               this.autoLogout(expiresIn * 1000)
               console.log(user);
-              localStorage.setItem('userData' , JSON.stringify(user))
+              localStorage.setItem('userData' , JSON.stringify(user)) // set in localstorage the user data
     }
 
     private errorHandling(errorRes: HttpErrorResponse) {

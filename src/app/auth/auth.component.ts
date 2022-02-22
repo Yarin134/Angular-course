@@ -1,8 +1,10 @@
-import { Component } from "@angular/core";
+import { Component, ComponentFactoryResolver, OnDestroy, ViewChild } from "@angular/core";
 import { NgForm } from '@angular/forms';
-import { Observable } from "rxjs";
+import { Observable, Subscription } from "rxjs";
 import { AuthResponseData, AuthService } from "./auth.service";
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
+import { AlertComponent } from "../shared/alert/alert.component";
+import { PlaceHolderDirective } from "../shared/placeholder/placeholder.directive";
 
 @Component({
     selector:'app-auth' ,
@@ -11,11 +13,13 @@ import { Router, ActivatedRoute } from '@angular/router';
 
 export class AuthComponent{
 
-constructor(private authService: AuthService  , private router:Router) {}
+constructor(private authService: AuthService  , private router:Router , private componentFactoryResolver:ComponentFactoryResolver) {}
 
     isLogginMode = true;
     isLoading = false;
     error : string = null;
+    @ViewChild(PlaceHolderDirective, {static:false}) alertHost:PlaceHolderDirective
+    private closeSub:Subscription
 
     onSwitchMode() {
         this.isLogginMode = !this.isLogginMode
@@ -31,7 +35,7 @@ constructor(private authService: AuthService  , private router:Router) {}
 
         this.isLoading = true;
 
-        let authObservable: Observable<AuthResponseData>
+        let authObservable: Observable<AuthResponseData> // AuthResponseData is what coming back from the observable
 
         if(this.isLogginMode) {
             
@@ -52,7 +56,7 @@ constructor(private authService: AuthService  , private router:Router) {}
             } , fullErrorRes => {  // contains the message in the observable we returned in (switch case)
                 console.log(fullErrorRes);
                 this.error = fullErrorRes;
-                
+                // this.showErrorAlert(fullErrorRes)
                 this.isLoading = false;
                 
             })
@@ -61,4 +65,27 @@ constructor(private authService: AuthService  , private router:Router) {}
         
         
     }
+
+    onHandleError(){
+        this.error = null;
+    }
+
+    // private showErrorAlert(fullErrorRes) {
+    //     const alertCmpFactory = this.componentFactoryResolver.resolveComponentFactory(AlertComponent)
+    //     const hostViewContainerRef = this.alertHost.viewContainerRef;
+    //     hostViewContainerRef.clear();
+    //     const componentRef = hostViewContainerRef.createComponent(alertCmpFactory);
+
+    //     componentRef.instance.message = fullErrorRes;
+    //     this.closeSub = componentRef.instance.close.subscribe(() => {
+    //         this.closeSub.unsubscribe(); 
+    //         hostViewContainerRef.clear(); // clear all the content there
+    //     })
+    // }
+
+    // ngOnDestroy(): void {
+    //     if(this.closeSub) {
+    //         this.closeSub.unsubscribe();
+    //     }
+    // }
 }

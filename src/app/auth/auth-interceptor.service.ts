@@ -2,7 +2,6 @@ import { HttpHandler, HttpInterceptor, HttpParams, HttpRequest } from "@angular/
 import { Injectable } from "@angular/core";
 import { exhaustMap, take } from "rxjs/operators";
 import { AuthService } from "./auth.service";
-import { User } from "./user.model";
 
 @Injectable()
 export class AuthInterceptorService implements HttpInterceptor{
@@ -10,14 +9,11 @@ export class AuthInterceptorService implements HttpInterceptor{
     constructor(private authService:AuthService) {}
     intercept(req: HttpRequest<any>, next: HttpHandler){
         
-        
         return this.authService.user.pipe(take(1) , exhaustMap(user => {
         
-            // console.log(this.authService.user.pipe(take(1)));
             if(!user) {  // or null or user(with properties)
                 console.log('hello from interceptor');
                 return next.handle(req); // returns an observable
-                
             }
             else {
             const modifiedReq = req.clone({params:new HttpParams().set('auth' , user.token)})
@@ -30,3 +26,5 @@ export class AuthInterceptorService implements HttpInterceptor{
 
 // in the log in ,  without token in the header , after that , EVERY request gets the token .
 // because we want previous data , we use BehaviourSubject
+
+// with exahustMap - we can override the current observable , and return another observable (like in the handle method)
